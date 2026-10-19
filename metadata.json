@@ -1,0 +1,6 @@
+{
+  "name": "AstroPulse - NASA Astronaut Health & Bio-Sentinel",
+  "description": "Deep-space astronaut health monitoring dashboard with zero-latency autonomous diagnostics, PVT cognitive vigilance testing, radiation shelter alerts, and NASA aerospace clinical protocols.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
