@@ -1,21 +1,2873 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AstroPulse - NASA Astronaut Health & Bio-Sentinel</title>
-    <meta name="description" content="Deep-space astronaut health monitoring dashboard with zero-latency autonomous diagnostics, PVT cognitive vigilance testing, radiation shelter alerts, and NASA aerospace clinical protocols." />
-    <meta property="og:title" content="AstroPulse - NASA Astronaut Health & Bio-Sentinel" />
-    <meta property="og:description" content="Deep-space astronaut health monitoring dashboard with zero-latency autonomous diagnostics, PVT cognitive vigilance testing, radiation shelter alerts, and NASA aerospace clinical protocols." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-[#07090e] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AstroPulse - NASA Astronaut Health & Bio-Sentinel</title>
+  <meta name="description" content="Deep-space astronaut health monitoring dashboard with zero-latency autonomous diagnostics, PVT cognitive vigilance testing, radiation shelter alerts, and NASA aerospace clinical protocols.">
+  <meta property="og:title" content="AstroPulse - NASA Astronaut Health & Bio-Sentinel">
+  <meta property="og:description" content="Deep-space astronaut health monitoring dashboard running 100% in any browser.">
+  <meta name="theme-color" content="#07090e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    /* ==========================================================================
+       AEROSPACE CLINICAL HUD DESIGN SYSTEM - 100% SELF-CONTAINED CSS
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --bg-canvas: #07090e;
+      --bg-surface: #0b0f1a;
+      --bg-surface-elevated: #0e1424;
+      --bg-surface-dark: #05070d;
+      --border-subtle: #1e293b;
+      --border-panel: rgba(51, 65, 85, 0.7);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --cyan-core: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.2);
+      --emerald-nominal: #10b981;
+      --emerald-bg: rgba(16, 185, 129, 0.12);
+      --amber-warning: #f59e0b;
+      --amber-bg: rgba(245, 158, 11, 0.14);
+      --rose-critical: #f43f5e;
+      --rose-bg: rgba(244, 63, 94, 0.18);
+      --font-interface: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    }
 
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-interface);
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: 76px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .font-mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Container constraints */
+    .app-container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Top Telemetry Header */
+    header.hud-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 13, 22, 0.94);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 0;
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand-zone {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .brand-title {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Telemetry Ribbon Center */
+    .telemetry-ribbon {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .telemetry-separator {
+      color: var(--border-subtle);
+      user-select: none;
+    }
+    .status-badge {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .status-badge.normal {
+      color: #34d399;
+      background: var(--emerald-bg);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .status-badge.warning {
+      color: #fbbf24;
+      background: var(--amber-bg);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .status-badge.critical {
+      color: #f87171;
+      background: var(--rose-bg);
+      border-color: rgba(244, 63, 94, 0.5);
+      animation: pulseAlert 1.5s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    /* Header Action Controls */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      user-select: none;
+      min-height: 34px;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+    .btn-secondary:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .btn-cyan {
+      background: rgba(8, 145, 178, 0.2);
+      color: #38bdf8;
+      border-color: rgba(8, 145, 178, 0.5);
+    }
+    .btn-cyan:hover {
+      background: rgba(8, 145, 178, 0.35);
+      color: #fff;
+    }
+    .btn-amber {
+      background: #f59e0b;
+      color: #0b0f1a;
+      border-color: #d97706;
+    }
+    .btn-amber:hover {
+      background: #fbbf24;
+    }
+    .btn-rose {
+      background: #e11d48;
+      color: #fff;
+      border-color: #be123c;
+    }
+    .btn-rose:hover {
+      background: #f43f5e;
+    }
+    .btn-icon {
+      padding: 7px;
+      width: 34px;
+      height: 34px;
+    }
+
+    /* Emergency Alert Banner */
+    .emergency-banner {
+      width: 100%;
+      padding: 10px 0;
+      border-bottom: 1px solid transparent;
+      display: none;
+      transition: all 0.3s ease;
+    }
+    .emergency-banner.show-warning {
+      display: block;
+      background: rgba(120, 53, 15, 0.85);
+      border-color: rgba(245, 158, 11, 0.8);
+      color: #fef3c7;
+    }
+    .emergency-banner.show-critical {
+      display: block;
+      background: rgba(136, 19, 55, 0.9);
+      border-color: rgba(244, 63, 94, 0.8);
+      color: #ffe4e6;
+    }
+    .emergency-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .emergency-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emergency-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .emergency-banner.show-critical .emergency-icon {
+      background: #f43f5e;
+      color: #fff;
+    }
+    .emergency-banner.show-warning .emergency-icon {
+      background: #f59e0b;
+      color: #0b0f1a;
+    }
+    .emergency-title {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+    .emergency-msg {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .emergency-action-text {
+      font-size: 11px;
+      opacity: 0.85;
+    }
+
+    /* Sub-nav Information strip */
+    .info-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0 10px 0;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+    .info-strip strong {
+      color: var(--text-main);
+    }
+
+    /* Main Dashboard Layout */
+    main.dashboard-body {
+      padding: 18px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Grid of 8 Vital Cards */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .vital-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .vital-card:hover {
+      border-color: #475569;
+    }
+    .vital-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .vital-label-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .vital-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .vital-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+    }
+    .vital-badge.nominal {
+      color: #34d399;
+      background: var(--emerald-bg);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .vital-badge.warning {
+      color: #fbbf24;
+      background: var(--amber-bg);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .vital-badge.critical {
+      color: #f87171;
+      background: var(--rose-bg);
+      border-color: rgba(244, 63, 94, 0.5);
+    }
+
+    .vital-main {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 4px 0 10px 0;
+    }
+    .vital-number {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #fff;
+      line-height: 1;
+    }
+    .vital-unit {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-left: 4px;
+      text-transform: uppercase;
+    }
+    .vital-sparkline {
+      width: 80px;
+      height: 24px;
+      overflow: visible;
+      flex-shrink: 0;
+    }
+
+    .vital-bottom {
+      border-top: 1px solid rgba(51, 65, 85, 0.4);
+      padding-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+    .vital-bottom strong {
+      color: var(--text-muted);
+    }
+
+    /* Asymmetric Split Workspace */
+    .workspace-split {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      background: var(--bg-surface-elevated);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .panel-title {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Video/Canvas Pose Feed */
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 230px;
+      background: #04070d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #poseCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .canvas-hud-tl {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: rgba(6, 182, 212, 0.85);
+      background: rgba(5, 7, 13, 0.75);
+      padding: 3px 8px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .canvas-hud-tr {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(5, 7, 13, 0.75);
+      border: 1px solid #334155;
+      padding: 3px 8px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .canvas-hud-bl {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(5, 7, 13, 0.85);
+      border: 1px solid #334155;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .vision-metrics-row {
+      background: var(--bg-surface-elevated);
+      border-top: 1px solid var(--border-subtle);
+      padding: 10px 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .vision-metrics-row .metric-label {
+      color: var(--text-dim);
+      font-size: 10px;
+      text-transform: uppercase;
+      display: block;
+    }
+    .vision-metrics-row .metric-val {
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 13px;
+    }
+
+    .vision-footer-bar {
+      padding: 8px 14px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    /* High-Risk Checklist & Interlock */
+    .checklist-gate-banner {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .checklist-gate-banner.locked {
+      background: rgba(244, 63, 94, 0.12);
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+    .checklist-gate-banner.cleared {
+      background: rgba(16, 185, 129, 0.12);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+    .checklist-item.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .checklist-item:not(.disabled):hover {
+      background: rgba(30, 41, 59, 0.4);
+    }
+    .checklist-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .checkbox-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #38bdf8;
+    }
+    .checklist-item.checked .checkbox-icon {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #fff;
+    }
+    .checklist-text {
+      font-size: 12px;
+      color: var(--text-main);
+    }
+    .checklist-item.checked .checklist-text {
+      text-decoration: line-through;
+      color: var(--text-dim);
+    }
+
+    /* AI Medical Officer */
+    .ai-summary-box {
+      padding: 12px 14px;
+      background: rgba(5, 8, 15, 0.8);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    .ai-summary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .ai-analysis-text {
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .actionable-protocols-strip {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(51, 65, 85, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .consultation-feed {
+      padding: 12px 14px;
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg-bubble {
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      border: 1px solid transparent;
+    }
+    .msg-bubble.user {
+      align-self: flex-end;
+      background: #1e293b;
+      border-color: #334155;
+      color: #f1f5f9;
+      max-width: 85%;
+    }
+    .msg-bubble.agent {
+      align-self: flex-start;
+      background: rgba(6, 182, 212, 0.08);
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #e2e8f0;
+      max-width: 95%;
+    }
+    .msg-header {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .quick-prompts-bar {
+      padding: 8px 14px;
+      background: rgba(5, 7, 13, 0.7);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .quick-chip {
+      font-size: 11px;
+      background: #1e293b;
+      color: var(--text-muted);
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .quick-chip:hover {
+      background: #334155;
+      color: #38bdf8;
+    }
+
+    .consult-input-row {
+      padding: 8px 12px;
+      background: var(--bg-surface-elevated);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 8px;
+    }
+    .consult-input {
+      flex: 1;
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #fff;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      outline: none;
+    }
+    .consult-input:focus {
+      border-color: var(--cyan-core);
+    }
+
+    /* Fixed Bottom Scenario Control Panel */
+    footer.scenario-dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(9, 13, 22, 0.95);
+      border-top: 1px solid #334155;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+    }
+    .scenario-dock-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .scenario-left-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .scenario-title-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .speed-pills {
+      display: flex;
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid #334155;
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .speed-btn {
+      padding: 2px 8px;
+      background: transparent;
+      color: var(--text-dim);
+      border: none;
+      cursor: pointer;
+    }
+    .speed-btn.active {
+      background: var(--cyan-core);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .scenario-core-buttons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .scenario-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      min-height: 34px;
+    }
+    .scenario-btn.baseline {
+      background: #10b981;
+      color: #064e3b;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+    .scenario-btn.baseline:hover {
+      background: #34d399;
+    }
+    .scenario-btn.solar {
+      background: #e11d48;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(225, 29, 72, 0.3);
+    }
+    .scenario-btn.solar:hover {
+      background: #f43f5e;
+    }
+    .scenario-btn.fatigue {
+      background: #f59e0b;
+      color: #451a03;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    }
+    .scenario-btn.fatigue:hover {
+      background: #fbbf24;
+    }
+
+    /* Manual tuning drawer */
+    .manual-sliders-drawer {
+      display: none;
+      background: #0d1322;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+    .manual-sliders-drawer.open {
+      display: grid;
+    }
+    .slider-col label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .slider-col input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan-core);
+      cursor: pointer;
+    }
+
+    /* Modals & Backdrop */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.2s ease;
+    }
+    .modal-overlay.open {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+    .modal-header {
+      background: var(--bg-surface-elevated);
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .modal-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      background: var(--bg-surface-elevated);
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* PVT Reaction Box */
+    .pvt-target-box {
+      width: 100%;
+      height: 180px;
+      border-radius: 10px;
+      background: #04060d;
+      border: 2px dashed #334155;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      margin: 12px 0;
+    }
+    .pvt-target-box.counting {
+      background: rgba(225, 29, 72, 0.15);
+      border-color: #f43f5e;
+      box-shadow: 0 0 25px rgba(244, 63, 94, 0.4);
+    }
+    .pvt-counter {
+      font-size: 56px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #f43f5e;
+      letter-spacing: 0.05em;
+    }
+
+    /* Alert Drawer (Slide from right) */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(3px);
+      z-index: 100;
+      display: flex;
+      justify-content: flex-end;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.25s ease;
+    }
+    .drawer-overlay.open {
+      visibility: visible;
+      opacity: 1;
+    }
+    .drawer-card {
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+    }
+    .drawer-overlay.open .drawer-card {
+      transform: translateX(0);
+    }
+    .alert-item {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .alert-item.critical {
+      background: rgba(225, 29, 72, 0.1);
+      border-color: rgba(225, 29, 72, 0.4);
+    }
+    .alert-item.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 1024px) {
+      .vitals-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .workspace-split {
+        grid-template-columns: 1fr;
+      }
+      .manual-sliders-drawer {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .vitals-grid {
+        grid-template-columns: 1fr;
+      }
+      .telemetry-ribbon {
+        display: none;
+      }
+      .manual-sliders-drawer {
+        grid-template-columns: 1fr;
+      }
+      .scenario-dock-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .scenario-core-buttons {
+        justify-content: stretch;
+      }
+      .scenario-btn {
+        flex: 1;
+        justify-content: center;
+      }
+      body {
+        padding-bottom: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP TELEMETRY HEADER
+       ======================================================================== -->
+  <header class="hud-header">
+    <div class="app-container header-row">
+      <!-- Zone 1: Wordmark -->
+      <div class="brand-zone">
+        <div class="brand-icon">
+          <!-- Pulse / Activity SVG -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">AstroPulse Bio-Sentinel <span style="font-size:11px; font-weight:normal; color:#64748b; font-family:var(--font-mono);">/ AUR-001</span></div>
+          <div class="brand-subtitle">Dr. Maya Lin · EVA Flight Specialist</div>
+        </div>
+      </div>
+
+      <!-- Zone 2: Telemetry Ribbon -->
+      <div class="telemetry-ribbon">
+        <div>MET: <strong style="color:#f1f5f9;">Day 142</strong></div>
+        <span class="telemetry-separator">·</span>
+        <div title="Mars-to-Earth speed-of-light signal lag">Earth Lag: <strong id="earthLagVal" style="color:#38bdf8;">14m 18s</strong></div>
+        <span class="telemetry-separator">·</span>
+        <div>Readiness: <strong id="readinessScoreVal" style="color:#34d399;">98%</strong></div>
+        <span class="telemetry-separator">·</span>
+        <span id="globalStatusBadge" class="status-badge normal">NOMINAL</span>
+      </div>
+
+      <!-- Zone 3: Actions Suite -->
+      <div class="header-actions">
+        <!-- PVT Micro-test -->
+        <button id="topBtnPvt" class="btn btn-secondary" title="Launch 30-Second Psychomotor Vigilance Test">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>PVT Test</span>
+        </button>
+
+        <!-- Earth Burst Sync Packet -->
+        <button id="topBtnSync" class="btn btn-cyan" title="Generate Earth Ground Control Burst Sync Packet">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <span>Earth Sync</span>
+        </button>
+
+        <!-- Audio Alarms Toggle -->
+        <button id="btnAudioToggle" class="btn btn-secondary btn-icon" title="Toggle NASA Acoustic Alarms">
+          <svg id="iconAudioMuted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+          <svg id="iconAudioActive" style="display:none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        </button>
+
+        <!-- Alert Log Drawer Button with Badge -->
+        <button id="btnOpenAlerts" class="btn btn-secondary btn-icon" style="position:relative;" title="View Alert History Log">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span id="alertCountBadge" style="display:none; position:absolute; top:-4px; right:-4px; background:#e11d48; color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 5px; font-family:var(--font-mono);">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       EMERGENCY CAUTION & WARNING BANNER
+       ======================================================================== -->
+  <div id="emergencyBanner" class="emergency-banner">
+    <div class="app-container emergency-row">
+      <div class="emergency-left">
+        <div class="emergency-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <div>
+          <div class="emergency-title">DETERMINISTIC RULE ENGINE ALERT</div>
+          <div id="emergencyText" class="emergency-msg">Alert text goes here</div>
+          <div id="emergencySubtext" class="emergency-action-text">Action directive</div>
+        </div>
+      </div>
+      <div id="emergencyActions">
+        <button id="btnEmergencyAction" class="btn btn-rose">Execute Protocol</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SUB-STRIP: MISSION CONTEXT
+       ======================================================================== -->
+  <div class="app-container info-strip">
+    <div>VESSEL: <strong>ARES-IV MTV</strong> · TRAJECTORY: <strong>Earth-Mars Hohmann Transfer</strong> · DISTANCE: <strong>1.42 AU (212M km)</strong></div>
+    <div>ACTIVE SCENARIO: <strong id="currentScenarioLabel" style="color:#38bdf8;">BASELINE</strong> · TICK: <strong>1s</strong></div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN DASHBOARD CONTENT
+       ======================================================================== -->
+  <main class="app-container dashboard-body">
+
+    <!-- Section 1: 8 Primary Physiological & Environmental Vitals -->
+    <section>
+      <div class="section-header">
+        <div class="section-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+          <span>Astronaut Maya - Primary Physiological & Environmental Telemetry</span>
+        </div>
+        <div style="font-size:11px; font-family:var(--font-mono); color:#64748b;">1-Second Micro-Fluctuation Telemetry Engine</div>
+      </div>
+
+      <div class="vitals-grid">
+        <!-- 1. Heart Rate -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              <span class="vital-label">Heart Rate</span>
+            </div>
+            <span id="badgeHr" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valHr" class="vital-number">70</span>
+              <span class="vital-unit">BPM</span>
+            </div>
+            <svg id="sparkHr" class="vital-sparkline" viewBox="0 0 80 24"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,12 15,10 30,14 45,11 60,13 80,12"></polyline></svg>
+          </div>
+          <div class="vital-bottom">
+            <span>HRV: <strong id="valHrv">52 ms</strong></span>
+            <span>Bound: 60 - 95 BPM</span>
+          </div>
+        </div>
+
+        <!-- 2. Blood Oxygenation (SpO2) -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+              <span class="vital-label">Blood Oxygen (SpO2)</span>
+            </div>
+            <span id="badgeSpo2" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valSpo2" class="vital-number">98</span>
+              <span class="vital-unit">%</span>
+            </div>
+            <svg id="sparkSpo2" class="vital-sparkline" viewBox="0 0 80 24"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,12 20,11 40,13 60,12 80,12"></polyline></svg>
+          </div>
+          <div class="vital-bottom">
+            <span>ppO2: <strong>148 mmHg</strong></span>
+            <span>Bound: 95 - 99 %</span>
+          </div>
+        </div>
+
+        <!-- 3. Daily Radiation Dose (Core NASA Spec) -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+              <span class="vital-label">Daily Radiation</span>
+            </div>
+            <span id="badgeRad" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valRad" class="vital-number">0.15</span>
+              <span class="vital-unit">mSv/day</span>
+            </div>
+            <svg id="sparkRad" class="vital-sparkline" viewBox="0 0 80 24"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,12 20,13 40,11 60,12 80,12"></polyline></svg>
+          </div>
+          <div class="vital-bottom">
+            <span>Mission Total: <strong id="valCumRad">42.6 mSv</strong></span>
+            <span>Limit: &lt; 0.6 mSv</span>
+          </div>
+        </div>
+
+        <!-- 4. Core Body Temperature -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+              <span class="vital-label">Core Temperature</span>
+            </div>
+            <span id="badgeTemp" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valTemp" class="vital-number">36.7</span>
+              <span class="vital-unit">°C</span>
+            </div>
+            <svg id="sparkTemp" class="vital-sparkline" viewBox="0 0 80 24"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,12 20,11 40,12 60,11 80,12"></polyline></svg>
+          </div>
+          <div class="vital-bottom">
+            <span>Equiv: <strong id="valTempF">98.1°F</strong></span>
+            <span>Bound: 36.4 - 37.4 °C</span>
+          </div>
+        </div>
+
+        <!-- 5. Sleep Duration & Circadian Phase -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              <span class="vital-label">Sleep (Last 24h)</span>
+            </div>
+            <span id="badgeSleep" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valSleep" class="vital-number">8.0</span>
+              <span class="vital-unit">HRS</span>
+            </div>
+            <svg id="sparkSleep" class="vital-sparkline" viewBox="0 0 80 24"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,12 20,12 40,12 60,12 80,12"></polyline></svg>
+          </div>
+          <div class="vital-bottom">
+            <span>Circadian: <strong>Phase 14.2</strong></span>
+            <span>Bound: 7.0 - 8.5 hrs</span>
+          </div>
+        </div>
+
+        <!-- 6. Cabin CO2 (Closed-Loop ECLSS) -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg>
+              <span class="vital-label">Cabin CO2 (ECLSS)</span>
+            </div>
+            <span id="badgeCo2" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valCo2" class="vital-number">3250</span>
+              <span class="vital-unit">PPM</span>
+            </div>
+            <svg id="sparkCo2" class="vital-sparkline" viewBox="0 0 80 24"><polyline fill="none" stroke="#10b981" stroke-width="2" points="0,12 20,13 40,11 60,12 80,12"></polyline></svg>
+          </div>
+          <div class="vital-bottom">
+            <span>CDRA Scrub: <strong>Bed A (Nominal)</strong></span>
+            <span>Limit: &lt; 4200 ppm</span>
+          </div>
+        </div>
+
+        <!-- 7. Blood Pressure -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              <span class="vital-label">Blood Pressure</span>
+            </div>
+            <span id="badgeBp" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valBp" class="vital-number">118/76</span>
+              <span class="vital-unit">mmHg</span>
+            </div>
+            <span style="font-size:11px; font-family:var(--font-mono); color:#64748b;">MAP: 90</span>
+          </div>
+          <div class="vital-bottom">
+            <span>Systolic/Diastolic</span>
+            <span>Bound: 110-125 / 70-80</span>
+          </div>
+        </div>
+
+        <!-- 8. Musculoskeletal Degradation -->
+        <div class="vital-card">
+          <div class="vital-card-top">
+            <div class="vital-label-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span class="vital-label">Bone & Muscle Degradation</span>
+            </div>
+            <span id="badgeBone" class="vital-badge nominal">● Nominal</span>
+          </div>
+          <div class="vital-main">
+            <div>
+              <span id="valBone" class="vital-number">1.15</span>
+              <span class="vital-unit">% BMD</span>
+            </div>
+            <span style="font-size:11px; font-family:var(--font-mono); color:#64748b;">ARED Active</span>
+          </div>
+          <div class="vital-bottom">
+            <span>Muscle Atrophy: <strong id="valMuscle">1.82%</strong></span>
+            <span>Limit: &lt; 2.5%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Asymmetric Split Workspace (Vision & Safety vs AI Medical Officer) -->
+    <div class="workspace-split">
+      <!-- Left Column: Vision & Behavioral Posture Tracking + Mission Checklist Gate -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <!-- Panel 1: Vision Posture Tracker -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <span>Vision & Behavioral Posture Analysis</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button id="btnToggleTrackingMode" class="btn btn-secondary" style="font-size:11px; padding:3px 8px; min-height:26px;">Cognitive</button>
+              <button id="btnTogglePrivacy" class="btn btn-secondary" style="font-size:11px; padding:3px 8px; min-height:26px;">Privacy Shutter</button>
+            </div>
+          </div>
+
+          <div class="canvas-wrapper">
+            <canvas id="poseCanvas" width="480" height="230"></canvas>
+            <div class="canvas-hud-tl">CAM: HAB-FWD-02 · 1080p @ 30fps</div>
+            <div class="canvas-hud-tr">Affect: <span id="valAffect" style="color:#34d399; font-weight:700;">Nominal / Attentive</span></div>
+            <div id="exerciseHudOverlay" class="canvas-hud-bl">ARED Mode: Spine Vector 1.2° (Safe) · Load 142kg</div>
+          </div>
+
+          <div class="vision-metrics-row">
+            <div>
+              <span class="metric-label">Thoracic Slump</span>
+              <span id="valSlump" class="metric-val">3.8°</span>
+            </div>
+            <div>
+              <span class="metric-label">Blink Rate</span>
+              <span id="valBlink" class="metric-val">14 /min</span>
+            </div>
+            <div>
+              <span class="metric-label">Microsaccades</span>
+              <span id="valSaccades" class="metric-val">92%</span>
+            </div>
+            <div>
+              <span class="metric-label">PVT Intervene</span>
+              <span id="valPvtIntervene" style="color:#34d399; font-weight:700;">None Required</span>
+            </div>
+          </div>
+
+          <div class="vision-footer-bar">
+            <button id="btnDoorTransitionTest" style="background:none; border:none; color:#38bdf8; cursor:pointer; font-size:11px; font-family:var(--font-mono); text-decoration:underline;">
+              Test Post-Quarters Transit Analysis
+            </button>
+            <span>NASA-POSE-BIO-v3.1</span>
+          </div>
+        </div>
+
+        <!-- Panel 2: High-Risk Mission Checklist & Safety Interlock -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>High-Risk Mission Safety Interlock</span>
+            </div>
+            <span id="badgeInterlockStatus" class="status-badge normal">INTERLOCK CLEARED</span>
+          </div>
+
+          <div id="checklistGateBanner" class="checklist-gate-banner cleared">
+            <span id="checklistGateText">Safety Interlock cleared. Cognitive vigilance verified via NASA standard.</span>
+            <button id="btnGateLaunchPvt" class="btn btn-amber" style="padding:2px 8px; font-size:11px; min-height:26px; display:none;">Launch PVT</button>
+          </div>
+
+          <div id="checklistItemsList">
+            <div class="checklist-item" data-id="1">
+              <div class="checklist-left">
+                <div class="checkbox-icon">✓</div>
+                <span class="checklist-text">Verify EMU Spacesuit 100% O2 Pre-breathe (120 min cycle)</span>
+              </div>
+              <span class="status-badge critical" style="font-size:9px; padding:1px 4px;">CRITICAL</span>
+            </div>
+            <div class="checklist-item" data-id="2">
+              <div class="checklist-left">
+                <div class="checkbox-icon">✓</div>
+                <span class="checklist-text">External Airlock Outer Hatch Manual Interlock Latch release</span>
+              </div>
+              <span class="status-badge critical" style="font-size:9px; padding:1px 4px;">CRITICAL</span>
+            </div>
+            <div class="checklist-item" data-id="3">
+              <div class="checklist-left">
+                <div class="checkbox-icon">✓</div>
+                <span class="checklist-text">Primary Tether 85m reel tension & secondary carabiner lock</span>
+              </div>
+              <span class="status-badge critical" style="font-size:9px; padding:1px 4px;">CRITICAL</span>
+            </div>
+            <div class="checklist-item" data-id="4">
+              <div class="checklist-left">
+                <div class="checkbox-icon">✓</div>
+                <span class="checklist-text">SAFER Jetpack Nitrogen propulsion pressure check (P &gt; 3000 psi)</span>
+              </div>
+              <span class="status-badge warning" style="font-size:9px; padding:1px 4px;">ELEVATED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: AI Medical Officer (Bio-Sentinel Agent) -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12L2.1 12.1"></path><path d="M12 12v9.9"></path></svg>
+              <span>AI Medical Officer (Bio-Sentinel Agent)</span>
+            </div>
+            <span class="status-badge normal" style="font-size:10px;">Zero-Latency Local Engine</span>
+          </div>
+
+          <div class="ai-summary-box">
+            <div class="ai-summary-header">
+              <span style="color:#64748b;">Multi-Factor Synthesis:</span>
+              <strong id="aiSynthesisStatus" style="color:#34d399;">Multi-Factor Homeostasis</strong>
+            </div>
+            <div id="aiBehaviorAnalysisText" class="ai-analysis-text">
+              Cognitive function nominal. Posture standard. Biomechanical symmetry verified.
+            </div>
+
+            <!-- Actionable NASA Protocol Triggers -->
+            <div class="actionable-protocols-strip">
+              <span style="font-size:11px; color:#64748b;">Actionable Protocols:</span>
+              <button class="btn btn-secondary" onclick="openProtocolModal('ARED_EXERCISE')" style="padding:3px 8px; font-size:11px; min-height:26px;">ARED-T2 Resistance</button>
+              <button id="btnProtoSpe" class="btn btn-rose" onclick="openProtocolModal('STORM_HAVEN')" style="padding:3px 8px; font-size:11px; min-height:26px; display:none;">SPE-7 Storm Shelter</button>
+              <button id="btnProtoPvt" class="btn btn-amber" onclick="openProtocolModal('PVT_EVA_INTERLOCK')" style="padding:3px 8px; font-size:11px; min-height:26px; display:none;">BEH-1 PVT Interlock</button>
+              <button id="btnProtoEclss" class="btn btn-cyan" onclick="openProtocolModal('ECLSS_SCRUBBER')" style="padding:3px 8px; font-size:11px; min-height:26px; display:none;">ECLSS Scrubber Bypass</button>
+            </div>
+          </div>
+
+          <!-- Interactive Dialogue Box -->
+          <div id="consultationFeed" class="consultation-feed">
+            <div class="msg-bubble agent">
+              <div class="msg-header">
+                <span style="color:#38bdf8; font-weight:700;">Bio-Sentinel Flight Surgeon</span>
+                <span id="initConsultTime">00:00:00</span>
+              </div>
+              Autonomous aerospace decision matrix synchronized with NASA Flight Surgeon Clinical Directives. Multi-factor telemetry monitoring active.
+            </div>
+          </div>
+
+          <!-- Quick Prompts -->
+          <div class="quick-prompts-bar">
+            <span class="quick-chip" onclick="handleQuickConsult('Assess cognitive readiness for scheduled EVA airlock operations')">Cognitive Readiness for EVA</span>
+            <span class="quick-chip" onclick="handleQuickConsult('Evaluate acute SPE radiation exposure and storm shelter status')">Radiation & Storm Shelter</span>
+            <span class="quick-chip" onclick="handleQuickConsult('Review microgravity musculoskeletal loss & ARED prescription')">Bone & Muscle Countermeasures</span>
+            <span class="quick-chip" onclick="handleQuickConsult('Provide circadian rest and blue-depleted lighting schedule')">Circadian Lighting Protocol</span>
+          </div>
+
+          <!-- Prompt Input -->
+          <div class="consult-input-row">
+            <input type="text" id="consultInput" class="consult-input" placeholder="Consult autonomous flight surgeon on clinical status...">
+            <button id="btnSendConsult" class="btn btn-cyan">Consult</button>
+          </div>
+        </div>
+
+        <!-- Aerospace Reference Guide Panel -->
+        <div class="panel" style="padding:14px; font-size:11px; font-family:var(--font-mono); color:#94a3b8; line-height:1.6;">
+          <div style="font-weight:700; color:#f1f5f9; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.04em; display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>Aerospace Flight Surgeon Threshold Boundaries</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><strong style="color:#e2e8f0;">Radiation Threshold:</strong> Warning at 0.6 mSv; Critical at 1.0 mSv/day triggers mandatory Storm Haven shelter. NASA Career limit is 600 mSv.</div>
+            <div><strong style="color:#e2e8f0;">Cognitive Fatigue:</strong> Sleep &lt; 5.0h + resting HR &gt; 90 BPM triggers PVT micro-test interlock to prevent EVA tether/procedural failure.</div>
+            <div><strong style="color:#e2e8f0;">ECLSS Hypercapnia:</strong> Cabin CO2 &gt; 4,200 ppm requires scrubber recirculation; &gt; 5,500 ppm brings acute cognitive slowing.</div>
+            <div><strong style="color:#e2e8f0;">Zero-Earth Comms:</strong> Mars-Earth 14m speed-of-light delay mandates 100% onboard local diagnostics with burst sync.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================================
+       FIXED BOTTOM SCENARIO CONTROL PANEL (JUDGE CONTROLS)
+       ======================================================================== -->
+  <footer class="scenario-dock">
+    <div class="app-container">
+      <!-- Collapsible Manual Sliders Strip -->
+      <div id="manualSlidersDrawer" class="manual-sliders-drawer">
+        <div class="slider-col">
+          <label><span>Heart Rate</span><strong id="sliderValHr" style="color:#38bdf8;">70 BPM</strong></label>
+          <input type="range" id="sliderHr" min="45" max="150" value="70">
+        </div>
+        <div class="slider-col">
+          <label><span>Daily Radiation</span><strong id="sliderValRad" style="color:#f43f5e;">0.15 mSv</strong></label>
+          <input type="range" id="sliderRad" min="0.05" max="3.0" step="0.05" value="0.15">
+        </div>
+        <div class="slider-col">
+          <label><span>Sleep Last 24h</span><strong id="sliderValSleep" style="color:#fbbf24;">8.0 hrs</strong></label>
+          <input type="range" id="sliderSleep" min="2.0" max="10.0" step="0.1" value="8.0">
+        </div>
+        <div class="slider-col">
+          <label><span>Cabin CO2</span><strong id="sliderValCo2" style="color:#c084fc;">3250 ppm</strong></label>
+          <input type="range" id="sliderCo2" min="2000" max="7500" step="50" value="3250">
+        </div>
+      </div>
+
+      <!-- Main Scenario Buttons Row -->
+      <div class="scenario-dock-inner">
+        <!-- Playback Rate & Clock -->
+        <div class="scenario-left-group">
+          <span class="scenario-title-label">Scenario Control:</span>
+          <button id="btnPlayPause" class="btn btn-secondary btn-icon" style="width:28px; height:28px; padding:4px;" title="Play/Pause 1-Second Clock">
+            <svg id="iconPause" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            <svg id="iconPlay" style="display:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </button>
+          <div class="speed-pills">
+            <button class="speed-btn active" onclick="setSimSpeed(1)">1x</button>
+            <button class="speed-btn" onclick="setSimSpeed(2)">2x</button>
+            <button class="speed-btn" onclick="setSimSpeed(5)">5x</button>
+          </div>
+        </div>
+
+        <!-- The 3 Core Judge Scenario Buttons -->
+        <div class="scenario-core-buttons">
+          <!-- Button 1: Baseline -->
+          <button id="btnScenarioBaseline" class="scenario-btn baseline" title="Vitals stabilize back to nominal baseline (HR: 70, SpO2: 98%, Rad: 0.1 mSv)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            <span>Baseline</span>
+          </button>
+
+          <!-- Button 2: Solar Flare Event -->
+          <button id="btnScenarioSolar" class="scenario-btn solar" title="Radiation climbs by 0.1 per second, eventually triggering CRITICAL UI alert to seek shelter">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <span>Solar Flare Event</span>
+          </button>
+
+          <!-- Button 3: Cognitive Fatigue -->
+          <button id="btnScenarioFatigue" class="scenario-btn fatigue" title="Sleep drops, heart rate elevates, triggering the PVT Micro-test protocol">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path></svg>
+            <span>Cognitive Fatigue</span>
+          </button>
+
+          <!-- Extra Scenarios -->
+          <button id="btnScenarioCo2" class="btn btn-secondary" onclick="triggerScenario('CABIN_CO2_SPIKE')" style="font-size:11px;" title="Cabin ECLSS Scrubber Leak">CO2 Spike</button>
+          <button id="btnScenarioDecondition" class="btn btn-secondary" onclick="triggerScenario('DECONDITIONING')" style="font-size:11px;" title="Microgravity Bone & Muscle Loss">Deconditioning</button>
+        </div>
+
+        <!-- Toggle Manual Sliders -->
+        <button id="btnToggleManualSliders" class="btn btn-secondary" style="font-size:11px; padding:4px 8px; min-height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+          <span>Manual Sliders</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       MODAL 1: 30-SECOND PSYCHOMOTOR VIGILANCE TEST (PVT)
+       ======================================================================== -->
+  <div id="pvtModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">NASA Psychomotor Vigilance Test (PVT-B Micro)</div>
+          <div class="modal-subtitle">Protocol: BEHAVIORAL-COG-1 · 30-Second Micro-Check</div>
+        </div>
+        <button class="btn btn-secondary btn-icon" onclick="closePvtModal()">✕</button>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <div id="pvtIdleState">
+          <p style="font-size:12px; color:#cbd5e1; line-height:1.6; margin-bottom:12px;">
+            Measures sustained attention and central nervous system reaction speed.
+            When the red digital millisecond counter starts, tap the box or press <kbd style="background:#1e293b; padding:2px 6px; border-radius:4px; font-family:var(--font-mono);">SPACEBAR</kbd> immediately!
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; background:#04070d; border:1px solid #1e293b; border-radius:6px; padding:10px; font-family:var(--font-mono); font-size:11px; margin-bottom:14px;">
+            <div><span style="color:#64748b; display:block;">Trials</span><strong>4 Stimuli</strong></div>
+            <div><span style="color:#64748b; display:block;">Pass Target</span><strong style="color:#34d399;">&lt; 355 ms</strong></div>
+            <div><span style="color:#64748b; display:block;">Lapse Cutoff</span><strong style="color:#f43f5e;">&gt; 500 ms</strong></div>
+          </div>
+          <button id="btnStartPvt" class="btn btn-cyan" style="width:100%; padding:10px; font-size:13px;">Begin 30s PVT Protocol</button>
+        </div>
+
+        <div id="pvtActiveState" style="display:none;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; font-family:var(--font-mono); color:#94a3b8; margin-bottom:8px;">
+            <span>Trial <strong id="pvtTrialNum">1</strong> of 4</span>
+            <span>False Starts: <strong id="pvtFalseStarts" style="color:#f59e0b;">0</strong></span>
+          </div>
+
+          <div id="pvtTargetBox" class="pvt-target-box">
+            <div id="pvtWaitingLabel" style="font-size:12px; font-family:var(--font-mono); color:#64748b;">STAND BY FOR STIMULUS...</div>
+            <div id="pvtCounterDisplay" class="pvt-counter" style="display:none;">000</div>
+            <div id="pvtFeedbackDisplay" style="display:none; font-size:13px; font-family:var(--font-mono); color:#fff;"></div>
+          </div>
+          <div style="font-size:11px; color:#64748b; font-family:var(--font-mono);">Tap screen or hit SPACEBAR when the red timer appears. Avoid false starts.</div>
+        </div>
+
+        <div id="pvtResultState" style="display:none; text-align:left;">
+          <div id="pvtResultBanner" style="padding:12px; border-radius:8px; margin-bottom:12px; font-size:12px;"></div>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; background:#04070d; border:1px solid #1e293b; border-radius:6px; padding:10px; font-family:var(--font-mono); font-size:11px; text-align:center; margin-bottom:14px;">
+            <div><span style="color:#64748b; display:block;">MEAN RT</span><strong id="pvtMeanRt" style="font-size:14px;">0 ms</strong></div>
+            <div><span style="color:#64748b; display:block;">LAPSES</span><strong id="pvtLapses" style="font-size:14px;">0</strong></div>
+            <div><span style="color:#64748b; display:block;">FALSE STARTS</span><strong id="pvtFinalFs" style="font-size:14px;">0</strong></div>
+            <div><span style="color:#64748b; display:block;">GATE STATUS</span><strong id="pvtGateStatus" style="font-size:12px;">CLEARED</strong></div>
+          </div>
+
+          <!-- Dual signoff override drawer -->
+          <div id="pvtOverrideSection" style="display:none; background:#1c1309; border:1px solid #92400e; padding:10px; border-radius:6px; margin-bottom:12px; font-size:11px; font-family:var(--font-mono);">
+            <div style="color:#fbbf24; font-weight:700; margin-bottom:6px;">NASA Dual-Key Mission Interlock Override:</div>
+            <select id="overrideOfficerSelect" style="width:100%; background:#0b0f1a; border:1px solid #78350f; color:#fff; padding:5px; border-radius:4px; margin-bottom:6px; font-family:var(--font-mono); font-size:11px;">
+              <option>Cmdr. Marcus Vance (Mission Commander)</option>
+              <option>Dr. Chen Li (Chief Medical Officer)</option>
+              <option>Lt. Col. Sarah Jenkins (Flight Director)</option>
+            </select>
+            <input type="text" id="overrideReasonInput" value="Critical scheduled orbital maneuver; second astronaut present as active observer." style="width:100%; background:#0b0f1a; border:1px solid #78350f; color:#fff; padding:5px; border-radius:4px; margin-bottom:8px; font-family:var(--font-mono); font-size:11px;">
+            <button id="btnApplyOverride" class="btn btn-amber" style="width:100%; font-size:11px;">Authorize Cryptographic Dual-Signoff</button>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="restartPvtTest()" style="flex:1;">Retest PVT</button>
+            <button id="btnShowOverride" class="btn btn-amber" onclick="toggleOverrideSection()" style="flex:1; display:none;">Dual-Signoff Waiver</button>
+            <button class="btn btn-cyan" onclick="closePvtModal()" style="flex:1;">Confirm & Return</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: EARTH GROUND CONTROL BURST SYNC PACKET
+       ======================================================================== -->
+  <div id="syncModal" class="modal-overlay">
+    <div class="modal-card" style="max-width:640px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Earth Ground Control Sync Packet (DSN Burst)</div>
+          <div class="modal-subtitle">Zero-Latency Offline Diagnostic Payload · Deep Space Network Uplink</div>
+        </div>
+        <button class="btn btn-secondary btn-icon" onclick="closeSyncModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; background:#04070d; border:1px solid #1e293b; border-radius:6px; padding:10px; font-family:var(--font-mono); font-size:11px; margin-bottom:12px;">
+          <div><span style="color:#64748b; display:block;">1-WAY LIGHT LAG</span><strong style="color:#38bdf8;">14m 18s (858s)</strong></div>
+          <div><span style="color:#64748b; display:block;">ROUND TRIP</span><strong style="color:#fbbf24;">28m 36s (1716s)</strong></div>
+          <div><span style="color:#64748b; display:block;">LOCAL STATUS</span><strong style="color:#34d399;">Autonomous Offline</strong></div>
+        </div>
+
+        <div style="font-size:11px; font-family:var(--font-mono); color:#64748b; margin-bottom:4px;">BURST JSON TELEMETRY PAYLOAD:</div>
+        <pre id="syncJsonPre" style="background:#020408; border:1px solid #1e293b; border-radius:6px; padding:10px; font-size:11px; font-family:var(--font-mono); color:#38bdf8; max-height:240px; overflow:auto;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCopySyncJson" class="btn btn-secondary">Copy JSON</button>
+        <button id="btnDownloadSyncJson" class="btn btn-secondary">Download .JSON</button>
+        <button id="btnQueueBurstUplink" class="btn btn-cyan">Queue Burst Uplink (DSN)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: NASA OPERATING DIRECTIVE / PROTOCOL VIEWER
+       ======================================================================== -->
+  <div id="protocolModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div id="protoCategory" class="modal-subtitle">NASA STANDARD OPERATING DIRECTIVE</div>
+          <div id="protoTitle" class="modal-title">Protocol Title</div>
+        </div>
+        <button class="btn btn-secondary btn-icon" onclick="closeProtocolModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:#04070d; border:1px solid #1e293b; border-radius:6px; padding:10px; margin-bottom:14px; font-family:var(--font-mono); font-size:11px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="color:#64748b;">PRIORITY:</span>
+            <strong id="protoPriority" style="color:#f43f5e;">IMMEDIATE</strong>
+          </div>
+          <p id="protoDescription" style="color:#cbd5e1; line-height:1.5;"></p>
+        </div>
+        <div style="font-size:11px; font-family:var(--font-mono); font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:8px;">
+          Sequential Action Directives:
+        </div>
+        <div id="protoStepsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-cyan" onclick="closeProtocolModal()">Acknowledge & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       DRAWER: MEDICAL & TELEMETRY ALERT LOG
+       ======================================================================== -->
+  <div id="alertDrawer" class="drawer-overlay">
+    <div class="drawer-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Medical & Flight Telemetry Alert Log</div>
+          <div id="drawerSubtitle" class="modal-subtitle">0 Active / 0 Total</div>
+        </div>
+        <button class="btn btn-secondary btn-icon" onclick="closeAlertDrawer()">✕</button>
+      </div>
+      <div style="padding:8px 12px; background:#0e1424; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-secondary" onclick="setAlertFilter('ALL')" style="padding:2px 8px; font-size:11px; min-height:26px;">All</button>
+          <button class="btn btn-secondary" onclick="setAlertFilter('ACTIVE')" style="padding:2px 8px; font-size:11px; min-height:26px;">Active</button>
+          <button class="btn btn-secondary" onclick="setAlertFilter('CRITICAL')" style="padding:2px 8px; font-size:11px; min-height:26px;">Critical</button>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-secondary" onclick="ackAllAlerts()" style="padding:2px 8px; font-size:11px; min-height:26px;">Ack All</button>
+          <button class="btn btn-secondary" onclick="clearAllAlerts()" style="padding:2px 8px; font-size:11px; min-height:26px;">Clear</button>
+        </div>
+      </div>
+      <div id="alertItemsContainer" style="padding:12px; overflow-y:auto; flex:1;"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       STANDALONE JAVASCRIPT STATE ENGINE & NASA CLINICAL LOGIC
+       ======================================================================== -->
+  <script>
+    // --- 1. Audio Annunciator (Web Audio API) ---
+    class WebAudioAnnunciator {
+      constructor() {
+        this.ctx = null;
+        this.muted = true;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) this.ctx = new AudioContextClass();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      toggle() {
+        this.muted = !this.muted;
+        if (!this.muted) this.init();
+        return this.muted;
+      }
+      playCaution() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [0, 0.18].forEach(offset => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now + offset);
+          gain.gain.setValueAtTime(0.12, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.12);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + 0.12);
+        });
+      }
+      playCritical() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(650, now);
+        osc.frequency.setValueAtTime(950, now + 0.15);
+        osc.frequency.setValueAtTime(650, now + 0.3);
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1400, now);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      }
+      playStimulus() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1000, now);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+    }
+    const annunciator = new WebAudioAnnunciator();
+
+    // --- 2. NASA Protocols Data Dictionary ---
+    const NASA_PROTOCOLS = {
+      STORM_HAVEN: {
+        id: 'SPE-7',
+        category: 'RADIATION SAFETY DIRECTIVE',
+        title: 'NASA SPE-7: Emergency Radiation Storm Shelter Relocation',
+        priority: 'IMMEDIATE',
+        description: 'Activated during acute Solar Particle Events (SPE) when ionizing dose rate exceeds 1.0 mSv/day or solar proton flux breaches shielding envelope.',
+        steps: [
+          'Immediately cease all Extravehicular Activity (EVA) and unshielded outer cupola work.',
+          'Sound spacecraft acoustic storm shelter alert (Code Red).',
+          'Relocate astronaut Maya to central MTV Storm Haven module surrounded by water-wall and propellant bulkheads.',
+          'Deploy secondary polyethylene radiation curtains across forward airlock bulkheads.',
+          'Power down non-critical telemetry transmitters facing the solar coronal CME vector.',
+          'Initiate automated burst radiation logging for Earth Deep Space Network queue.'
+        ]
+      },
+      PVT_EVA_INTERLOCK: {
+        id: 'BEH-1',
+        category: 'BEHAVIORAL & COGNITIVE HEALTH',
+        title: 'NASA BEHAVIORAL-COG-1: Mandatory PVT & EVA Interlock Protocol',
+        priority: 'IMMEDIATE',
+        description: 'Safety gate initiated when sleep duration drops below 5.0h, cognitive fatigue index exceeds 60%, or micro-saccadic ocular tracking signals neural strain.',
+        steps: [
+          'Lock high-risk mission checklists (EVA airlock outer hatch release, manual RCS thruster docking, high-voltage battery transfer).',
+          'Astronaut must complete a calibrated 30-second Psychomotor Vigilance Test (PVT).',
+          'Pass criterion: Mean Reaction Time < 355 milliseconds with 0 attention lapses (>500ms).',
+          'If test fails: Mandatory 45-minute sensory-deprivation rest nap with 450nm blue-depleted circadian lighting.',
+          'Emergency Waiver: Requires dual-key cryptographic signoff from Mission Commander or Chief Medical Officer.'
+        ]
+      },
+      ECLSS_SCRUBBER: {
+        id: 'ECLSS-CO2',
+        category: 'LIFE SUPPORT & ATMOSPHERE',
+        title: 'NASA ECLSS-CO2-MAX: CDRA Scrubber Emergency Bypass Protocol',
+        priority: 'ELEVATED',
+        description: 'Enacted when cabin carbon dioxide exceeds 4,200 ppm to prevent hypercapnic headaches, spatial disorientation, and cognitive slowing.',
+        steps: [
+          'Cycle Carbon Dioxide Removal Assembly (CDRA) adsorbent beds to high-rate thermal regeneration cycle.',
+          'Install auxiliary Lithium Hydroxide (LiOH) scrubber canisters into cabin return loop.',
+          'Verify sleep station personal ventilation blower velocity is greater than 0.15 m/s to prevent stagnant CO2 pockets.',
+          'Administer diagnostic blood gas check and survey crew for cephalalgia or visual shimmering.'
+        ]
+      },
+      ARED_EXERCISE: {
+        id: 'ARED-T2',
+        category: 'MUSCULOSKELETAL COUNTERMEASURES',
+        title: 'NASA ARED-T2: Microgravity Resistance Protocol',
+        priority: 'ROUTINE',
+        description: 'Prescribed to prevent microgravity bone mineral density loss (1-1.5% monthly in microgravity) and postural soleus muscle atrophy.',
+        steps: [
+          'Complete 2.5 hours of daily structured exercise (60 min ARED resistance, 45 min T2 bungee treadmill, 30 min cycle ergometer).',
+          'Calibrate ARED vacuum cylinder loads to minimum 75% 1-Rep Max for lumbar axial loading.',
+          'Take daily oral Vitamin D3 (2000 IU) and monthly bisphosphonate countermeasure supplement.',
+          'Inspect joint kinematics via computer-vision posture telemetry to avoid spinal shear stresses.'
+        ]
+      }
+    };
+
+    // --- 3. Baseline Flight Telemetry State ---
+    const telemetryState = {
+      heartRate: 70,
+      spo2: 98,
+      temperature: 36.7,
+      dailyRadiation: 0.15,
+      cumulativeRadiation: 42.6,
+      sleepDuration: 8.0,
+      cabinCo2: 3250,
+      bloodPressure: { systolic: 118, diastolic: 76 },
+      boneDensityLoss: 1.15,
+      muscleMassLoss: 1.82,
+      hrvRmssd: 52,
+      cognitiveFatigueIndex: 12,
+      readinessScore: 98,
+      status: 'NORMAL',
+      simulationMode: 'NORMAL',
+      isClockRunning: true,
+      playbackSpeed: 1,
+      warnings: [],
+      critical: [],
+      aiAnalysis: 'Cognitive function nominal. Posture standard. Biomechanical symmetry verified.',
+      history: {
+        hr: [70, 71, 70, 69, 70, 71, 72, 70],
+        spo2: [98, 98, 99, 98, 98, 97, 98, 98],
+        rad: [0.14, 0.15, 0.15, 0.16, 0.14, 0.15],
+        temp: [36.7, 36.7, 36.8, 36.7, 36.6, 36.7],
+        sleep: [8.0, 8.0, 7.9, 8.0, 8.1, 8.0],
+        co2: [3200, 3240, 3220, 3260, 3250, 3230]
+      }
+    };
+
+    // Alert Log Storage
+    let alertLog = [];
+    try {
+      const saved = localStorage.getItem('astropulse_alerts_v2');
+      if (saved) alertLog = JSON.parse(saved);
+    } catch(e) {}
+    if (alertLog.length === 0) {
+      alertLog = [{
+        id: 'ALT-INIT-01',
+        status: 'NORMAL',
+        message: 'Bio-Sentinel Telemetry initial handshake nominal. Baseline vitals calibrated.',
+        time: new Date().toLocaleTimeString(),
+        acknowledged: true
+      }];
+    }
+
+    let pvtRecords = [];
+    let pvtCleared = true;
+    let prevStatus = 'NORMAL';
+    let prevCriticalMsg = '';
+
+    // --- 4. Deterministic Rule Engine ---
+    function evaluateDeterministicRules(s) {
+      const warnings = [];
+      const critical = [];
+
+      // Radiation Check (Core Requirement)
+      if (s.dailyRadiation >= 1.0) {
+        critical.push('CRITICAL: High Solar Radiation Spike (SPE > 1.0 mSv/day). Relocate to Emergency Storm Shelter immediately.');
+      } else if (s.dailyRadiation >= 0.6) {
+        warnings.push('Radiation elevated (>0.6 mSv/day). Limit crew exposure near outer spacecraft hull.');
+      }
+
+      // Heart Rate Check
+      if (s.heartRate > 120) {
+        critical.push('Heart rate critically elevated (>120 BPM). Potential tachyarrhythmia.');
+      } else if (s.heartRate > 100) {
+        warnings.push('Heart rate elevated (>100 BPM). Tachycardia watch active.');
+      } else if (s.heartRate < 48) {
+        warnings.push('Bradycardia warning: Heart rate below 48 BPM.');
+      }
+
+      // SpO2 Check
+      if (s.spo2 < 90) {
+        critical.push('Oxygen saturation critically low (<90%). Severe hypoxemia detected.');
+      } else if (s.spo2 < 95) {
+        warnings.push('Oxygen saturation low (<95%). Inspect cabin ventilation ducts.');
+      }
+
+      // Temperature Check
+      if (s.temperature > 38.5) {
+        critical.push('Core body temperature critically high (>38.5°C). Space pyrexia alert.');
+      } else if (s.temperature > 37.5) {
+        warnings.push('Body temperature elevated (>37.5°C). Rest and hydration recommended.');
+      }
+
+      // Cabin CO2 Check
+      if (s.cabinCo2 > 5500) {
+        critical.push('Cabin CO2 critically high (>5500 ppm). Acute hypercapnia risk. Check scrubbers.');
+      } else if (s.cabinCo2 > 4200) {
+        warnings.push('Cabin CO2 elevated (>4200 ppm). Exceeds nominal ISS baseline comfort envelope.');
+      }
+
+      // Sleep & Fatigue Check (Core Requirement)
+      if (s.sleepDuration < 5.0 && s.heartRate > 90) {
+        critical.push('Cognitive Fatigue High (<5.0h sleep, elevated HR). PVT Micro-test required before EVA.');
+      } else if (s.sleepDuration < 6.0 || s.hrvRmssd < 30) {
+        warnings.push('Circadian strain detected: Sleep deficit (<6.0h) and depressed HRV.');
+      }
+
+      // Overall status
+      let status = 'NORMAL';
+      if (critical.length > 0) status = 'CRITICAL';
+      else if (warnings.length > 0) status = 'WARNING';
+
+      return { status, warnings, critical };
+    }
+
+    // Compound Operational Readiness Score (0-100%)
+    function calculateReadinessScore(s) {
+      let score = 100;
+      if (s.dailyRadiation > 1.0) score -= 40;
+      else if (s.dailyRadiation > 0.6) score -= 20;
+
+      if (s.sleepDuration < 4.0) score -= 35;
+      else if (s.sleepDuration < 5.5) score -= 20;
+      else if (s.sleepDuration < 7.0) score -= 10;
+
+      if (s.heartRate > 120) score -= 25;
+      else if (s.heartRate > 100) score -= 15;
+
+      if (s.spo2 < 90) score -= 30;
+      else if (s.spo2 < 95) score -= 12;
+
+      if (s.cabinCo2 > 5500) score -= 20;
+      else if (s.cabinCo2 > 4200) score -= 10;
+
+      return Math.max(5, Math.min(100, Math.round(score)));
+    }
+
+    // --- 5. Micro-Fluctuation Telemetry Loop ---
+    function approach(cur, target, step, jitter) {
+      const diff = target - cur;
+      const delta = Math.sign(diff) * Math.min(Math.abs(diff), step);
+      const noise = (Math.random() - 0.5) * 2 * jitter;
+      return cur + delta + noise;
+    }
+
+    function tickSimulation() {
+      const s = telemetryState;
+      const mode = s.simulationMode;
+
+      if (mode === 'NORMAL') {
+        // Core Requirement: Baseline vitals stabilize with micro-fluctuations
+        s.heartRate = Math.round(approach(s.heartRate, 71, 0.5, 0.6));
+        s.spo2 = Math.round(approach(s.spo2, 98.2, 0.1, 0.2));
+        s.temperature = Math.round(approach(s.temperature, 36.7, 0.02, 0.02) * 10) / 10;
+        s.dailyRadiation = Math.max(0.08, Math.round(approach(s.dailyRadiation, 0.15, 0.01, 0.01) * 100) / 100);
+        s.sleepDuration = Math.round(approach(s.sleepDuration, 8.0, 0.05, 0.01) * 10) / 10;
+        s.cabinCo2 = Math.round(approach(s.cabinCo2, 3250, 15, 20));
+        s.hrvRmssd = Math.round(approach(s.hrvRmssd, 52, 0.5, 0.8));
+        s.aiAnalysis = 'Cognitive function nominal. Posture standard. Biomechanical symmetry verified.';
+      } else if (mode === 'SOLAR_FLARE') {
+        // Core Requirement: Radiation climbs by 0.1 per second, eventually triggering CRITICAL alert
+        s.dailyRadiation = Math.round((s.dailyRadiation + 0.10) * 100) / 100;
+        s.cumulativeRadiation += 0.25;
+        s.heartRate = Math.round(approach(s.heartRate, s.dailyRadiation > 1.0 ? 106 : 88, 0.6, 0.8));
+        s.temperature = Math.round(approach(s.temperature, 37.2, 0.02, 0.01) * 10) / 10;
+
+        if (s.dailyRadiation >= 1.0) {
+          s.aiAnalysis = 'EMERGENCY: Acute Solar Particle Event (SPE > 1.0 mSv/day) breached! Relocate crew to Module Storm Haven immediately.';
+        } else {
+          s.aiAnalysis = 'Solar activity rising rapidly. Energetic proton flux wavefront intersecting spacecraft hull.';
+        }
+      } else if (mode === 'COGNITIVE_FATIGUE') {
+        // Core Requirement: Sleep drops, heart rate elevates, triggering PVT micro-test protocol
+        s.sleepDuration = Math.round(approach(s.sleepDuration, 3.6, 0.15, 0.02) * 10) / 10;
+        s.heartRate = Math.round(approach(s.heartRate, 104, 0.6, 0.8));
+        s.hrvRmssd = Math.round(approach(s.hrvRmssd, 21, 0.8, 0.5));
+        s.cabinCo2 = Math.round(approach(s.cabinCo2, 4700, 30, 20));
+        s.aiAnalysis = 'High fatigue detected via chronic sleep deficit, diminished HRV, and microsaccadic eye tracking. PVT test mandatory.';
+        pvtCleared = false;
+      } else if (mode === 'CABIN_CO2_SPIKE') {
+        s.cabinCo2 = Math.round(approach(s.cabinCo2, 5800, 50, 20));
+        s.spo2 = Math.round(approach(s.spo2, 92, 0.2, 0.3));
+        s.heartRate = Math.round(approach(s.heartRate, 108, 0.5, 0.8));
+        s.aiAnalysis = 'ECLSS Warning: Cabin CO2 critical (>5500 ppm). Scrubber efficiency degraded. Don auxiliary masks.';
+      } else if (mode === 'DECONDITIONING') {
+        s.boneDensityLoss = Math.round(approach(s.boneDensityLoss, 3.4, 0.04, 0.01) * 100) / 100;
+        s.muscleMassLoss = Math.round(approach(s.muscleMassLoss, 4.9, 0.05, 0.01) * 100) / 100;
+        s.heartRate = Math.round(approach(s.heartRate, 88, 0.4, 0.6));
+        s.aiAnalysis = 'Microgravity deconditioning trend: Missed resistance cycles detected. Orthostatic intolerance risk elevated.';
+      }
+
+      // Update history arrays
+      s.history.hr = [...s.history.hr.slice(-14), s.heartRate];
+      s.history.spo2 = [...s.history.spo2.slice(-14), s.spo2];
+      s.history.rad = [...s.history.rad.slice(-14), s.dailyRadiation];
+      s.history.temp = [...s.history.temp.slice(-14), s.temperature];
+      s.history.sleep = [...s.history.sleep.slice(-14), s.sleepDuration];
+      s.history.co2 = [...s.history.co2.slice(-14), s.cabinCo2];
+
+      // Re-evaluate rules
+      const evalRes = evaluateDeterministicRules(s);
+      s.status = evalRes.status;
+      s.warnings = evalRes.warnings;
+      s.critical = evalRes.critical;
+      s.readinessScore = calculateReadinessScore(s);
+
+      // Audio alerts on transition
+      if (s.status === 'CRITICAL' && prevStatus !== 'CRITICAL') {
+        annunciator.playCritical();
+      } else if (s.status === 'WARNING' && prevStatus === 'NORMAL') {
+        annunciator.playCaution();
+      }
+      prevStatus = s.status;
+
+      // Save alert to log if new
+      if (s.critical.length > 0 && s.critical[0] !== prevCriticalMsg) {
+        prevCriticalMsg = s.critical[0];
+        addAlert('CRITICAL', s.critical[0]);
+      } else if (s.warnings.length > 0 && s.status === 'WARNING' && s.warnings[0] !== prevCriticalMsg) {
+        prevCriticalMsg = s.warnings[0];
+        addAlert('WARNING', s.warnings[0]);
+      }
+
+      updateUI();
+    }
+
+    function addAlert(status, message) {
+      alertLog.unshift({
+        id: 'ALT-' + Date.now().toString(36).toUpperCase(),
+        status,
+        message,
+        time: new Date().toLocaleTimeString(),
+        acknowledged: false
+      });
+      try {
+        localStorage.setItem('astropulse_alerts_v2', JSON.stringify(alertLog.slice(0, 40)));
+      } catch(e) {}
+    }
+
+    // --- 6. Render UI Updates ---
+    function renderSparklineSvg(arr, stroke) {
+      if (!arr || arr.length < 2) return '';
+      const min = Math.min(...arr);
+      const max = Math.max(...arr);
+      const range = max - min === 0 ? 1 : max - min;
+      const pts = arr.map((v, i) => {
+        const x = (i / (arr.length - 1)) * 80;
+        const y = 22 - ((v - min) / range) * 18 - 2;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+      return `<polyline fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" points="${pts}"></polyline>`;
+    }
+
+    function updateUI() {
+      const s = telemetryState;
+
+      // Top Ribbon
+      document.getElementById('readinessScoreVal').textContent = `${s.readinessScore}%`;
+      const globalBadge = document.getElementById('globalStatusBadge');
+      globalBadge.className = `status-badge ${s.status.toLowerCase()}`;
+      globalBadge.textContent = s.status;
+
+      // Emergency Banner
+      const banner = document.getElementById('emergencyBanner');
+      if (s.status === 'CRITICAL') {
+        banner.className = 'emergency-banner show-critical';
+        document.getElementById('emergencyText').textContent = s.critical[0] || 'CRITICAL TELEMETRY BREACH';
+        if (s.dailyRadiation >= 1.0) {
+          document.getElementById('emergencySubtext').textContent = 'Action: Move to Module Storm Haven immediately. Outer hull compromised.';
+          document.getElementById('btnEmergencyAction').textContent = 'Open Storm Haven Protocol';
+          document.getElementById('btnEmergencyAction').onclick = () => openProtocolModal('STORM_HAVEN');
+        } else {
+          document.getElementById('emergencySubtext').textContent = 'Action: Aerospace clinical intervention required.';
+          document.getElementById('btnEmergencyAction').textContent = 'View Action Checklist';
+          document.getElementById('btnEmergencyAction').onclick = () => openProtocolModal('PVT_EVA_INTERLOCK');
+        }
+      } else if (s.status === 'WARNING') {
+        banner.className = 'emergency-banner show-warning';
+        document.getElementById('emergencyText').textContent = s.warnings[0] || 'TELEMETRY ENVELOPE WARNING';
+        document.getElementById('emergencySubtext').textContent = 'Automated NASA aerospace countermeasures recommended.';
+        document.getElementById('btnEmergencyAction').textContent = 'View Protocol';
+        document.getElementById('btnEmergencyAction').onclick = () => openProtocolModal('ARED_EXERCISE');
+      } else {
+        banner.className = 'emergency-banner';
+      }
+
+      // Vitals Values
+      document.getElementById('valHr').textContent = s.heartRate;
+      document.getElementById('valHrv').textContent = `${s.hrvRmssd} ms`;
+      document.getElementById('badgeHr').className = `vital-badge ${s.heartRate > 120 ? 'critical' : s.heartRate > 100 || s.heartRate < 48 ? 'warning' : 'nominal'}`;
+      document.getElementById('badgeHr').textContent = s.heartRate > 120 ? '✖ Critical' : s.heartRate > 100 ? '▲ Warning' : '● Nominal';
+      document.getElementById('sparkHr').innerHTML = renderSparklineSvg(s.history.hr, s.heartRate > 100 ? '#f59e0b' : '#10b981');
+
+      document.getElementById('valSpo2').textContent = s.spo2;
+      document.getElementById('badgeSpo2').className = `vital-badge ${s.spo2 < 90 ? 'critical' : s.spo2 < 95 ? 'warning' : 'nominal'}`;
+      document.getElementById('badgeSpo2').textContent = s.spo2 < 90 ? '✖ Critical' : s.spo2 < 95 ? '▲ Warning' : '● Nominal';
+      document.getElementById('sparkSpo2').innerHTML = renderSparklineSvg(s.history.spo2, s.spo2 < 95 ? '#f59e0b' : '#10b981');
+
+      document.getElementById('valRad').textContent = s.dailyRadiation.toFixed(2);
+      document.getElementById('valCumRad').textContent = `${s.cumulativeRadiation.toFixed(1)} mSv`;
+      document.getElementById('badgeRad').className = `vital-badge ${s.dailyRadiation >= 1.0 ? 'critical' : s.dailyRadiation >= 0.6 ? 'warning' : 'nominal'}`;
+      document.getElementById('badgeRad').textContent = s.dailyRadiation >= 1.0 ? '✖ Critical (SPE)' : s.dailyRadiation >= 0.6 ? '▲ Warning' : '● Nominal';
+      document.getElementById('sparkRad').innerHTML = renderSparklineSvg(s.history.rad, s.dailyRadiation >= 1.0 ? '#f43f5e' : s.dailyRadiation >= 0.6 ? '#f59e0b' : '#10b981');
+
+      document.getElementById('valTemp').textContent = s.temperature.toFixed(1);
+      document.getElementById('valTempF').textContent = `${((s.temperature * 9) / 5 + 32).toFixed(1)}°F`;
+      document.getElementById('badgeTemp').className = `vital-badge ${s.temperature > 38.5 ? 'critical' : s.temperature > 37.5 ? 'warning' : 'nominal'}`;
+      document.getElementById('badgeTemp').textContent = s.temperature > 38.5 ? '✖ Critical' : s.temperature > 37.5 ? '▲ Warning' : '● Nominal';
+      document.getElementById('sparkTemp').innerHTML = renderSparklineSvg(s.history.temp, s.temperature > 37.5 ? '#f59e0b' : '#10b981');
+
+      document.getElementById('valSleep').textContent = s.sleepDuration.toFixed(1);
+      document.getElementById('badgeSleep').className = `vital-badge ${s.sleepDuration < 5.0 && s.heartRate > 90 ? 'critical' : s.sleepDuration < 6.0 ? 'warning' : 'nominal'}`;
+      document.getElementById('badgeSleep').textContent = s.sleepDuration < 5.0 && s.heartRate > 90 ? '✖ High Fatigue' : s.sleepDuration < 6.0 ? '▲ Warning' : '● Nominal';
+      document.getElementById('sparkSleep').innerHTML = renderSparklineSvg(s.history.sleep, s.sleepDuration < 6.0 ? '#f59e0b' : '#10b981');
+
+      document.getElementById('valCo2').textContent = s.cabinCo2;
+      document.getElementById('badgeCo2').className = `vital-badge ${s.cabinCo2 > 5500 ? 'critical' : s.cabinCo2 > 4200 ? 'warning' : 'nominal'}`;
+      document.getElementById('badgeCo2').textContent = s.cabinCo2 > 5500 ? '✖ Critical' : s.cabinCo2 > 4200 ? '▲ Warning' : '● Nominal';
+      document.getElementById('sparkCo2').innerHTML = renderSparklineSvg(s.history.co2, s.cabinCo2 > 4200 ? '#f59e0b' : '#10b981');
+
+      document.getElementById('valBone').textContent = s.boneDensityLoss.toFixed(2);
+      document.getElementById('valMuscle').textContent = `${s.muscleMassLoss.toFixed(2)}%`;
+      document.getElementById('badgeBone').className = `vital-badge ${s.boneDensityLoss > 3.0 ? 'warning' : 'nominal'}`;
+
+      // AI Summary
+      document.getElementById('aiBehaviorAnalysisText').textContent = s.aiAnalysis;
+      const synth = document.getElementById('aiSynthesisStatus');
+      synth.textContent = s.status === 'CRITICAL' ? 'Multi-Factor Emergency Risk' : s.status === 'WARNING' ? 'Multi-Factor Warning Drift' : 'Multi-Factor Homeostasis';
+      synth.style.color = s.status === 'CRITICAL' ? '#f87171' : s.status === 'WARNING' ? '#fbbf24' : '#34d399';
+
+      // Protocol Buttons dynamic visibility
+      document.getElementById('btnProtoSpe').style.display = s.dailyRadiation >= 0.6 ? 'inline-flex' : 'none';
+      document.getElementById('btnProtoPvt').style.display = s.sleepDuration < 6.0 || !pvtCleared ? 'inline-flex' : 'none';
+      document.getElementById('btnProtoEclss').style.display = s.cabinCo2 > 4000 ? 'inline-flex' : 'none';
+
+      // Checklist Gate
+      const gate = document.getElementById('checklistGateBanner');
+      const gateText = document.getElementById('checklistGateText');
+      const gateBtn = document.getElementById('btnGateLaunchPvt');
+      const badgeInterlock = document.getElementById('badgeInterlockStatus');
+      const checklistItems = document.querySelectorAll('.checklist-item');
+
+      if (!pvtCleared) {
+        gate.className = 'checklist-gate-banner locked';
+        gateText.textContent = 'INTERLOCKED: Requires valid PVT test clearance (<355ms) or Dual-Signoff Override.';
+        gateBtn.style.display = 'inline-flex';
+        badgeInterlock.className = 'status-badge critical';
+        badgeInterlock.textContent = 'INTERLOCKED (LOCKED)';
+        checklistItems.forEach(el => el.classList.add('disabled'));
+      } else {
+        gate.className = 'checklist-gate-banner cleared';
+        gateText.textContent = 'Safety Interlock cleared. Cognitive vigilance verified via NASA standard.';
+        gateBtn.style.display = 'none';
+        badgeInterlock.className = 'status-badge normal';
+        badgeInterlock.textContent = 'INTERLOCK CLEARED';
+        checklistItems.forEach(el => el.classList.remove('disabled'));
+      }
+
+      // Alert Count Badge
+      const activeAlerts = alertLog.filter(a => !a.acknowledged);
+      const countBadge = document.getElementById('alertCountBadge');
+      if (activeAlerts.length > 0) {
+        countBadge.style.display = 'inline-block';
+        countBadge.textContent = activeAlerts.length;
+      } else {
+        countBadge.style.display = 'none';
+      }
+
+      // Scenario label
+      document.getElementById('currentScenarioLabel').textContent = s.simulationMode;
+    }
+
+    // --- 7. Interactive Scenario Triggers ---
+    function triggerScenario(mode) {
+      telemetryState.simulationMode = mode;
+      telemetryState.isClockRunning = true;
+      document.getElementById('iconPause').style.display = 'block';
+      document.getElementById('iconPlay').style.display = 'none';
+
+      const s = telemetryState;
+      if (mode === 'NORMAL') {
+        s.dailyRadiation = 0.15;
+        s.heartRate = 70;
+        s.spo2 = 98;
+        s.temperature = 36.7;
+        s.sleepDuration = 8.0;
+        s.cabinCo2 = 3250;
+        s.hrvRmssd = 52;
+        pvtCleared = true;
+        prevCriticalMsg = '';
+      } else if (mode === 'SOLAR_FLARE') {
+        s.dailyRadiation = 0.55;
+        annunciator.playCaution();
+      } else if (mode === 'COGNITIVE_FATIGUE') {
+        s.sleepDuration = 4.2;
+        s.heartRate = 96;
+        s.hrvRmssd = 22;
+        s.cabinCo2 = 4600;
+        pvtCleared = false;
+      } else if (mode === 'CABIN_CO2_SPIKE') {
+        s.cabinCo2 = 5600;
+        s.spo2 = 93;
+        s.heartRate = 104;
+      } else if (mode === 'DECONDITIONING') {
+        s.boneDensityLoss = 3.4;
+        s.muscleMassLoss = 4.8;
+      }
+      tickSimulation();
+    }
+
+    document.getElementById('btnScenarioBaseline').onclick = () => triggerScenario('NORMAL');
+    document.getElementById('btnScenarioSolar').onclick = () => triggerScenario('SOLAR_FLARE');
+    document.getElementById('btnScenarioFatigue').onclick = () => triggerScenario('COGNITIVE_FATIGUE');
+
+    // Simulation Clock
+    let simTimer = setInterval(tickSimulation, 1000);
+    function setSimSpeed(mult) {
+      telemetryState.playbackSpeed = mult;
+      clearInterval(simTimer);
+      simTimer = setInterval(tickSimulation, 1000 / mult);
+      document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    document.getElementById('btnPlayPause').onclick = () => {
+      telemetryState.isClockRunning = !telemetryState.isClockRunning;
+      if (telemetryState.isClockRunning) {
+        simTimer = setInterval(tickSimulation, 1000 / telemetryState.playbackSpeed);
+        document.getElementById('iconPause').style.display = 'block';
+        document.getElementById('iconPlay').style.display = 'none';
+      } else {
+        clearInterval(simTimer);
+        document.getElementById('iconPause').style.display = 'none';
+        document.getElementById('iconPlay').style.display = 'block';
+      }
+    };
+
+    // Manual Tuning Sliders
+    document.getElementById('btnToggleManualSliders').onclick = () => {
+      const d = document.getElementById('manualSlidersDrawer');
+      d.classList.toggle('open');
+    };
+    document.getElementById('sliderHr').oninput = (e) => {
+      telemetryState.heartRate = Number(e.target.value);
+      document.getElementById('sliderValHr').textContent = `${e.target.value} BPM`;
+      tickSimulation();
+    };
+    document.getElementById('sliderRad').oninput = (e) => {
+      telemetryState.dailyRadiation = Number(e.target.value);
+      document.getElementById('sliderValRad').textContent = `${Number(e.target.value).toFixed(2)} mSv`;
+      tickSimulation();
+    };
+    document.getElementById('sliderSleep').oninput = (e) => {
+      telemetryState.sleepDuration = Number(e.target.value);
+      document.getElementById('sliderValSleep').textContent = `${Number(e.target.value).toFixed(1)} hrs`;
+      tickSimulation();
+    };
+    document.getElementById('sliderCo2').oninput = (e) => {
+      telemetryState.cabinCo2 = Number(e.target.value);
+      document.getElementById('sliderValCo2').textContent = `${e.target.value} ppm`;
+      tickSimulation();
+    };
+
+    // Audio Toggle
+    document.getElementById('btnAudioToggle').onclick = () => {
+      const isMuted = annunciator.toggle();
+      document.getElementById('iconAudioMuted').style.display = isMuted ? 'block' : 'none';
+      document.getElementById('iconAudioActive').style.display = isMuted ? 'none' : 'block';
+    };
+
+    // Checklist click handler
+    document.getElementById('checklistItemsList').onclick = (e) => {
+      if (!pvtCleared) return;
+      const item = e.target.closest('.checklist-item');
+      if (item) item.classList.toggle('checked');
+    };
+
+    // --- 8. Canvas Pose & Posture Biomechanics ---
+    const canvas = document.getElementById('poseCanvas');
+    const ctx = canvas.getContext('2d');
+    let poseFrame = 0;
+    let privacyActive = false;
+    let exerciseTracking = false;
+
+    function renderPoseAnimation() {
+      poseFrame++;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.fillStyle = '#050810';
+      ctx.fillRect(0, 0, w, h);
+
+      if (privacyActive) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
+        ctx.textAlign = 'center';
+        ctx.fillText('CREW PRIVACY SHUTTER ACTIVE', w / 2, h / 2 - 8);
+        ctx.font = '10px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
+        ctx.fillText('Washroom / Sleep Quarters Protected', w / 2, h / 2 + 12);
+        requestAnimationFrame(renderPoseAnimation);
+        return;
+      }
+
+      // Technical grid lines
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.45)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 32) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 32) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      const t = poseFrame * 0.04;
+      const isFatigued = telemetryState.sleepDuration < 5.0 || telemetryState.cognitiveFatigueIndex > 50;
+      const breathing = Math.sin(t * 1.5) * 2;
+      const slumpOffset = isFatigued ? Math.sin(t * 0.5) * 8 + 12 : Math.sin(t * 0.8) * 3;
+
+      const headX = w / 2;
+      const headY = 60 + (isFatigued ? 10 : 0) + breathing;
+      const neckY = headY + 20;
+      const spineMidY = neckY + 40;
+      const spineBaseY = spineMidY + 36;
+      const wireColor = isFatigued ? '#f59e0b' : '#06b6d4';
+      const jointColor = isFatigued ? '#fbbf24' : '#22d3ee';
+
+      // Head
+      ctx.strokeStyle = wireColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(headX + slumpOffset * 0.5, headY, 16, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Facial bounding box
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.strokeRect(headX + slumpOffset * 0.5 - 13, headY - 13, 26, 26);
+
+      // Spine
+      ctx.strokeStyle = wireColor;
+      ctx.beginPath();
+      ctx.moveTo(headX + slumpOffset * 0.5, neckY);
+      ctx.lineTo(headX + slumpOffset * 0.8, spineMidY);
+      ctx.lineTo(headX, spineBaseY);
+      ctx.stroke();
+
+      // Shoulders
+      const leftS = headX - 38;
+      const rightS = headX + 38;
+      ctx.beginPath();
+      ctx.moveTo(leftS, neckY + 6);
+      ctx.lineTo(rightS, neckY + 6);
+      ctx.stroke();
+
+      // Arms
+      if (exerciseTracking) {
+        const wave = Math.sin(t * 3) * 22;
+        ctx.beginPath();
+        ctx.moveTo(leftS, neckY + 6);
+        ctx.lineTo(leftS - 18, neckY + 40 + wave);
+        ctx.lineTo(leftS - 8, neckY + 75 + wave);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(rightS, neckY + 6);
+        ctx.lineTo(rightS + 18, neckY + 40 - wave);
+        ctx.lineTo(rightS + 8, neckY + 75 - wave);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(leftS, neckY + 6);
+        ctx.lineTo(leftS - 12, neckY + 40);
+        ctx.lineTo(leftS + 8, neckY + 68);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(rightS, neckY + 6);
+        ctx.lineTo(rightS + 12, neckY + 40);
+        ctx.lineTo(rightS - 8, neckY + 68);
+        ctx.stroke();
+      }
+
+      // Joints
+      ctx.fillStyle = jointColor;
+      [[headX + slumpOffset * 0.5, neckY], [leftS, neckY + 6], [rightS, neckY + 6], [headX + slumpOffset * 0.8, spineMidY], [headX, spineBaseY]].forEach(([jx, jy]) => {
+        ctx.beginPath();
+        ctx.arc(jx, jy, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(renderPoseAnimation);
+    }
+    requestAnimationFrame(renderPoseAnimation);
+
+    document.getElementById('btnTogglePrivacy').onclick = () => {
+      privacyActive = !privacyActive;
+      document.getElementById('btnTogglePrivacy').textContent = privacyActive ? 'Privacy Active' : 'Privacy Shutter';
+    };
+    document.getElementById('btnToggleTrackingMode').onclick = () => {
+      exerciseTracking = !exerciseTracking;
+      document.getElementById('btnToggleTrackingMode').textContent = exerciseTracking ? 'ARED Active' : 'Cognitive';
+      document.getElementById('exerciseHudOverlay').style.display = exerciseTracking ? 'block' : 'none';
+    };
+    document.getElementById('btnDoorTransitionTest').onclick = () => {
+      alert('TRANSIT EVENT RECORDED: Private Stateroom -> Central MTV Hab.\nFacial micro-expression stress delta: 0.12 (Nominal coping envelope). No distress observed.');
+    };
+
+    // --- 9. Interactive PVT Test Logic ---
+    let pvtPhase = 'IDLE';
+    let pvtTrialIndex = 1;
+    let pvtReactionTimes = [];
+    let pvtFalseStartCount = 0;
+    let pvtStartTimestamp = 0;
+    let pvtAnimFrame = null;
+    let pvtTimerTimeout = null;
+
+    function openPvtModal() {
+      document.getElementById('pvtModal').classList.add('open');
+      restartPvtTest();
+    }
+    function closePvtModal() {
+      document.getElementById('pvtModal').classList.remove('open');
+      if (pvtTimerTimeout) clearTimeout(pvtTimerTimeout);
+      if (pvtAnimFrame) cancelAnimationFrame(pvtAnimFrame);
+    }
+    document.getElementById('topBtnPvt').onclick = openPvtModal;
+    document.getElementById('btnGateLaunchPvt').onclick = openPvtModal;
+
+    function restartPvtTest() {
+      pvtPhase = 'IDLE';
+      pvtTrialIndex = 1;
+      pvtReactionTimes = [];
+      pvtFalseStartCount = 0;
+      document.getElementById('pvtIdleState').style.display = 'block';
+      document.getElementById('pvtActiveState').style.display = 'none';
+      document.getElementById('pvtResultState').style.display = 'none';
+      document.getElementById('pvtOverrideSection').style.display = 'none';
+    }
+
+    document.getElementById('btnStartPvt').onclick = () => {
+      document.getElementById('pvtIdleState').style.display = 'none';
+      document.getElementById('pvtActiveState').style.display = 'block';
+      pvtStartNextTrial();
+    };
+
+    function pvtStartNextTrial() {
+      pvtPhase = 'WAITING';
+      document.getElementById('pvtTrialNum').textContent = pvtTrialIndex;
+      document.getElementById('pvtFalseStarts').textContent = pvtFalseStartCount;
+      document.getElementById('pvtWaitingLabel').style.display = 'block';
+      document.getElementById('pvtCounterDisplay').style.display = 'none';
+      document.getElementById('pvtFeedbackDisplay').style.display = 'none';
+      document.getElementById('pvtTargetBox').className = 'pvt-target-box';
+
+      const delay = Math.floor(Math.random() * 2200) + 1600;
+      pvtTimerTimeout = setTimeout(() => {
+        pvtPhase = 'COUNTING';
+        annunciator.playStimulus();
+        pvtStartTimestamp = performance.now();
+        document.getElementById('pvtWaitingLabel').style.display = 'none';
+        document.getElementById('pvtCounterDisplay').style.display = 'block';
+        document.getElementById('pvtTargetBox').className = 'pvt-target-box counting';
+
+        const updateCounter = () => {
+          const diff = Math.round(performance.now() - pvtStartTimestamp);
+          document.getElementById('pvtCounterDisplay').textContent = diff.toString().padStart(3, '0');
+          if (diff >= 2000) {
+            pvtFinishTrial(2000, true);
+          } else {
+            pvtAnimFrame = requestAnimationFrame(updateCounter);
+          }
+        };
+        pvtAnimFrame = requestAnimationFrame(updateCounter);
+      }, delay);
+    }
+
+    function pvtFinishTrial(rt, isTimeout) {
+      if (pvtAnimFrame) cancelAnimationFrame(pvtAnimFrame);
+      if (pvtTimerTimeout) clearTimeout(pvtTimerTimeout);
+      pvtReactionTimes.push(rt);
+      pvtPhase = 'FEEDBACK';
+
+      document.getElementById('pvtCounterDisplay').style.display = 'none';
+      document.getElementById('pvtFeedbackDisplay').style.display = 'block';
+      document.getElementById('pvtFeedbackDisplay').textContent = isTimeout ? 'TIMEOUT (2000ms)' : `${rt} ms recorded`;
+      document.getElementById('pvtTargetBox').className = 'pvt-target-box';
+
+      setTimeout(() => {
+        if (pvtTrialIndex < 4) {
+          pvtTrialIndex++;
+          pvtStartNextTrial();
+        } else {
+          pvtCompleteAll();
+        }
+      }, 1100);
+    }
+
+    function handlePvtInput() {
+      if (pvtPhase === 'WAITING') {
+        if (pvtTimerTimeout) clearTimeout(pvtTimerTimeout);
+        pvtFalseStartCount++;
+        document.getElementById('pvtFalseStarts').textContent = pvtFalseStartCount;
+        document.getElementById('pvtWaitingLabel').style.display = 'none';
+        document.getElementById('pvtFeedbackDisplay').style.display = 'block';
+        document.getElementById('pvtFeedbackDisplay').textContent = 'FALSE START! Responded before stimulus.';
+        setTimeout(pvtStartNextTrial, 1300);
+      } else if (pvtPhase === 'COUNTING') {
+        const rt = Math.round(performance.now() - pvtStartTimestamp);
+        pvtFinishTrial(rt, false);
+      }
+    }
+
+    document.getElementById('pvtTargetBox').onclick = handlePvtInput;
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && document.getElementById('pvtModal').classList.contains('open')) {
+        e.preventDefault();
+        handlePvtInput();
+      }
+    });
+
+    function pvtCompleteAll() {
+      pvtPhase = 'COMPLETE';
+      document.getElementById('pvtActiveState').style.display = 'none';
+      document.getElementById('pvtResultState').style.display = 'block';
+
+      const sum = pvtReactionTimes.reduce((a, b) => a + b, 0);
+      const mean = Math.round(sum / pvtReactionTimes.length);
+      const lapses = pvtReactionTimes.filter(r => r >= 500).length;
+      const passed = mean < 355 && lapses === 0 && pvtFalseStartCount <= 1;
+
+      document.getElementById('pvtMeanRt').textContent = `${mean} ms`;
+      document.getElementById('pvtLapses').textContent = lapses;
+      document.getElementById('pvtFinalFs').textContent = pvtFalseStartCount;
+      document.getElementById('pvtGateStatus').textContent = passed ? 'CLEARED' : 'FAILED';
+      document.getElementById('pvtGateStatus').style.color = passed ? '#34d399' : '#f87171';
+
+      const banner = document.getElementById('pvtResultBanner');
+      if (passed) {
+        banner.style.background = 'rgba(16, 185, 129, 0.15)';
+        banner.style.border = '1px solid #10b981';
+        banner.style.color = '#34d399';
+        banner.innerHTML = '<strong>COGNITIVE VIGILANCE VERIFIED (PASSED)</strong><br>Mean reaction time meets NASA aerospace specifications. High-risk mission checklists unlocked.';
+        pvtCleared = true;
+        document.getElementById('btnShowOverride').style.display = 'none';
+      } else {
+        banner.style.background = 'rgba(244, 63, 94, 0.15)';
+        banner.style.border = '1px solid #f43f5e';
+        banner.style.color = '#f87171';
+        banner.innerHTML = '<strong>COGNITIVE FATIGUE THRESHOLD EXCEEDED (FAILED)</strong><br>Reaction time sub-optimal. Procedural checklists locked. Retest or request Dual-Signoff Override.';
+        pvtCleared = false;
+        document.getElementById('btnShowOverride').style.display = 'inline-flex';
+      }
+      updateUI();
+    }
+
+    function toggleOverrideSection() {
+      const s = document.getElementById('pvtOverrideSection');
+      s.style.display = s.style.display === 'none' ? 'block' : 'none';
+    }
+    document.getElementById('btnApplyOverride').onclick = () => {
+      pvtCleared = true;
+      document.getElementById('pvtGateStatus').textContent = 'OVERRIDDEN';
+      document.getElementById('pvtGateStatus').style.color = '#fbbf24';
+      document.getElementById('pvtResultBanner').innerHTML = '<strong>DUAL-CREW OVERRIDE SIGNED</strong><br>Commander signed off on mission checklist unlock.';
+      document.getElementById('pvtOverrideSection').style.display = 'none';
+      document.getElementById('btnShowOverride').style.display = 'none';
+      updateUI();
+    };
+
+    // --- 10. Earth Ground Control Sync Packet ---
+    function openSyncModal() {
+      const s = telemetryState;
+      const packet = {
+        header: {
+          packetId: 'ARES4-BURST-' + Date.now().toString(36).toUpperCase(),
+          timestamp: new Date().toISOString(),
+          craftId: 'Ares IV MTV (Mars Transit)',
+          subject: 'Dr. Maya Lin (AUR-001)',
+          earthOneWayLagSeconds: 858,
+          transmissionStatus: 'QUEUED_FOR_DSN_BURST'
+        },
+        telemetry: {
+          status: s.status,
+          readinessScore: s.readinessScore,
+          heartRate: s.heartRate,
+          spo2: s.spo2,
+          dailyRadiationMsv: s.dailyRadiation,
+          cumulativeRadiationMsv: s.cumulativeRadiation,
+          sleepLast24h: s.sleepDuration,
+          cabinCo2Ppm: s.cabinCo2,
+          coreTempC: s.temperature
+        },
+        aiFlightSurgeonSummary: s.aiAnalysis,
+        activeAlertsCount: alertLog.filter(a => !a.acknowledged).length
+      };
+
+      const jsonStr = JSON.stringify(packet, null, 2);
+      document.getElementById('syncJsonPre').textContent = jsonStr;
+      document.getElementById('syncModal').classList.add('open');
+
+      document.getElementById('btnCopySyncJson').onclick = () => {
+        navigator.clipboard.writeText(jsonStr);
+        document.getElementById('btnCopySyncJson').textContent = 'Copied!';
+        setTimeout(() => document.getElementById('btnCopySyncJson').textContent = 'Copy JSON', 2000);
+      };
+      document.getElementById('btnDownloadSyncJson').onclick = () => {
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${packet.header.packetId}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+      document.getElementById('btnQueueBurstUplink').onclick = () => {
+        const btn = document.getElementById('btnQueueBurstUplink');
+        btn.textContent = 'Modulating DSN Carrier...';
+        setTimeout(() => {
+          btn.textContent = 'Burst Queued in High-Gain Buffer!';
+          btn.className = 'btn btn-amber';
+          setTimeout(() => {
+            btn.textContent = 'Queue Burst Uplink (DSN)';
+            btn.className = 'btn btn-cyan';
+          }, 3500);
+        }, 1500);
+      };
+    }
+    function closeSyncModal() {
+      document.getElementById('syncModal').classList.remove('open');
+    }
+    document.getElementById('topBtnSync').onclick = openSyncModal;
+
+    // --- 11. Protocols Modal ---
+    function openProtocolModal(key) {
+      const proto = NASA_PROTOCOLS[key];
+      if (!proto) return;
+      document.getElementById('protoCategory').textContent = proto.category;
+      document.getElementById('protoTitle').textContent = proto.title;
+      document.getElementById('protoPriority').textContent = proto.priority;
+      document.getElementById('protoDescription').textContent = proto.description;
+      const list = document.getElementById('protoStepsList');
+      list.innerHTML = proto.steps.map((step, idx) => `
+        <div style="background:#090d16; border:1px solid #1e293b; border-radius:6px; padding:8px 12px; font-size:12px; display:flex; gap:10px; align-items:start;">
+          <span style="background:#0c4a6e; color:#38bdf8; font-weight:700; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px; font-family:var(--font-mono);">${idx + 1}</span>
+          <span style="color:#e2e8f0; line-height:1.4;">${step}</span>
+        </div>
+      `).join('');
+      document.getElementById('protocolModal').classList.add('open');
+    }
+    function closeProtocolModal() {
+      document.getElementById('protocolModal').classList.remove('open');
+    }
+
+    // --- 12. Alert Drawer ---
+    let alertFilter = 'ALL';
+    function openAlertDrawer() {
+      renderAlertDrawer();
+      document.getElementById('alertDrawer').classList.add('open');
+    }
+    function closeAlertDrawer() {
+      document.getElementById('alertDrawer').classList.remove('open');
+    }
+    document.getElementById('btnOpenAlerts').onclick = openAlertDrawer;
+
+    function setAlertFilter(f) {
+      alertFilter = f;
+      renderAlertDrawer();
+    }
+    function ackAlert(id) {
+      const it = alertLog.find(a => a.id === id);
+      if (it) it.acknowledged = true;
+      try { localStorage.setItem('astropulse_alerts_v2', JSON.stringify(alertLog)); } catch(e) {}
+      renderAlertDrawer();
+      updateUI();
+    }
+    function ackAllAlerts() {
+      alertLog.forEach(a => a.acknowledged = true);
+      try { localStorage.setItem('astropulse_alerts_v2', JSON.stringify(alertLog)); } catch(e) {}
+      renderAlertDrawer();
+      updateUI();
+    }
+    function clearAllAlerts() {
+      alertLog = [];
+      try { localStorage.setItem('astropulse_alerts_v2', JSON.stringify(alertLog)); } catch(e) {}
+      renderAlertDrawer();
+      updateUI();
+    }
+
+    function renderAlertDrawer() {
+      const activeCount = alertLog.filter(a => !a.acknowledged).length;
+      document.getElementById('drawerSubtitle').textContent = `${activeCount} Active / ${alertLog.length} Total Logged Events`;
+      const container = document.getElementById('alertItemsContainer');
+      const filtered = alertLog.filter(a => {
+        if (alertFilter === 'ACTIVE') return !a.acknowledged;
+        if (alertFilter === 'CRITICAL') return a.status === 'CRITICAL';
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b; font-family:var(--font-mono); font-size:12px;">No alerts matching current filter. All telemetry streams nominal.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(a => `
+        <div class="alert-item ${a.status.toLowerCase()}" style="opacity:${a.acknowledged ? 0.65 : 1};">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-family:var(--font-mono); font-size:11px;">
+            <strong style="color:${a.status === 'CRITICAL' ? '#f43f5e' : '#f59e0b'};">${a.status}</strong>
+            <span style="color:#64748b;">${a.time}</span>
+          </div>
+          <div style="color:#e2e8f0; margin-bottom:6px;">${a.message}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; color:#64748b; font-family:var(--font-mono);">${a.id}</span>
+            ${!a.acknowledged ? `<button class="btn btn-secondary" onclick="ackAlert('${a.id}')" style="padding:2px 8px; font-size:10px; min-height:22px;">Acknowledge</button>` : `<span style="font-size:10px; color:#10b981; font-family:var(--font-mono);">✓ Acknowledged</span>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- 13. Interactive Clinical Consultation Dialogue ---
+    function handleQuickConsult(query) {
+      document.getElementById('consultInput').value = query;
+      runConsult();
+    }
+    function runConsult() {
+      const inp = document.getElementById('consultInput');
+      const text = inp.value.trim();
+      if (!text) return;
+      inp.value = '';
+
+      const feed = document.getElementById('consultationFeed');
+      const time = new Date().toLocaleTimeString();
+
+      // User Bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'msg-bubble user';
+      userBubble.innerHTML = `<div class="msg-header"><span>Astronaut Maya</span><span>${time}</span></div>${text}`;
+      feed.appendChild(userBubble);
+
+      // Thinking indicator
+      const thinking = document.createElement('div');
+      thinking.className = 'msg-bubble agent';
+      thinking.style.fontFamily = 'var(--font-mono)';
+      thinking.textContent = 'Bio-Sentinel Flight Surgeon synthesizing multi-factor telemetry...';
+      feed.appendChild(thinking);
+      feed.scrollTop = feed.scrollHeight;
+
+      setTimeout(() => {
+        feed.removeChild(thinking);
+        const lower = text.toLowerCase();
+        let reply = '';
+        const s = telemetryState;
+
+        if (lower.includes('eva') || lower.includes('cognitive') || lower.includes('fatigue')) {
+          if (s.sleepDuration < 5.0 || s.heartRate > 90 || !pvtCleared) {
+            reply = `CLINICAL EVALUATION:\nHigh cognitive fatigue detected. Astronaut recorded ${s.sleepDuration}h sleep with resting HR ${s.heartRate} BPM. NASA risk modeling predicts a 4.2x elevated risk of procedural omission or tether failure. EVA airlock interlock is strictly LOCKED. Required: Complete 30s PVT micro-test (Mean RT < 355ms) or obtain Commander Dual-Signoff.`;
+          } else {
+            reply = `CLINICAL EVALUATION:\nCognitive status nominal (Sleep: ${s.sleepDuration}h, HRV: ${s.hrvRmssd}ms, Fatigue: ${s.cognitiveFatigueIndex}%). Astronaut exhibits clear ocular saccades and nominal central nervous system vigilance. Cleared for scheduled EVA spacewalk preparation.`;
+          }
+        } else if (lower.includes('radiation') || lower.includes('spe') || lower.includes('shelter')) {
+          if (s.dailyRadiation >= 1.0) {
+            reply = `CRITICAL RADIATION ADVISORY:\nDaily ionizing dose is ${s.dailyRadiation.toFixed(2)} mSv/day, exceeding the NASA acute Solar Particle Event threshold. Spacecraft hull shielding is insufficient. Mandatory action: Relocate Maya to Module Storm Haven immediately and deploy water-wall shields.`;
+          } else {
+            reply = `RADIATION STATUS:\nDaily dose is ${s.dailyRadiation.toFixed(2)} mSv/day. Cumulative mission total is ${s.cumulativeRadiation.toFixed(1)} mSv (well within NASA career limit of 600 mSv). Background galactic cosmic rays within predicted transit bounds.`;
+          }
+        } else if (lower.includes('bone') || lower.includes('muscle') || lower.includes('ared')) {
+          reply = `MUSCULOSKELETAL ASSESSMENT:\nCumulative microgravity bone mineral density loss is ${s.boneDensityLoss}%, with muscle atrophy at ${s.muscleMassLoss}%. Adhere to 2.5h daily ARED vacuum resistance exercise (75% 1-Rep Max for lumbar/femoral preservation) plus bisphosphonate supplement.`;
+        } else {
+          reply = `GENERAL CLINICAL TELEMETRY:\nComposite Mission Readiness is ${s.readinessScore}%. Status: ${s.status}. Vitals: HR ${s.heartRate} BPM, SpO2 ${s.spo2}%, Core Temp ${s.temperature}°C, Cabin CO2 ${s.cabinCo2} ppm. Closed-loop life support operating normally.`;
+        }
+
+        const agentBubble = document.createElement('div');
+        agentBubble.className = 'msg-bubble agent';
+        agentBubble.innerHTML = `<div class="msg-header"><span style="color:#38bdf8; font-weight:700;">Bio-Sentinel Flight Surgeon</span><span>${new Date().toLocaleTimeString()}</span></div>${reply.replace(/\n/g, '<br>')}`;
+        feed.appendChild(agentBubble);
+        feed.scrollTop = feed.scrollHeight;
+      }, 500);
+    }
+
+    document.getElementById('btnSendConsult').onclick = runConsult;
+    document.getElementById('consultInput').onkeydown = (e) => {
+      if (e.key === 'Enter') runConsult();
+    };
+
+    // Initial setup on load
+    document.getElementById('initConsultTime').textContent = new Date().toLocaleTimeString();
+    updateUI();
+  </script>
+</body>
+</html>
